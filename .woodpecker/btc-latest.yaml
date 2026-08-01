@@ -1,0 +1,61 @@
+when:
+  - path:
+      include:
+        - '.woodpecker/btc-latest.yaml'
+        - 'apps/btc/overlays/latest/**'
+
+clone:
+  - name: git
+    image: woodpeckerci/plugin-git
+    volumes:
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+
+steps:
+  - name: lint
+    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    environment:
+      KUBECONFIG_DATA:
+        from_secret: btc-deployer
+      RPCPASS:
+        from_secret: btc_rpcpass
+    commands:
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
+      - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
+      - export KUBECONFIG=~/.kubeconfig
+
+      - >-
+        kubectl create secret generic btc-secrets
+        --namespace=btc
+        --from-literal=RPCPASS="$${RPCPASS}"
+        --dry-run=client -o yaml | kubectl apply --dry-run=client -f -
+
+      - kubectl apply -k ./apps/btc/overlays/latest/ --dry-run=client
+      - kubectl apply -k ./apps/btc/overlays/latest/ --dry-run=server
+
+  - name: deploy
+    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    environment:
+      KUBECONFIG_DATA:
+        from_secret: btc-deployer
+      RPCPASS:
+        from_secret: btc_rpcpass
+    when:
+      - event: push
+        branch: main
+    commands:
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
+      - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
+      - export KUBECONFIG=~/.kubeconfig
+
+      - >-
+        kubectl create secret generic btc-secrets
+        --namespace=btc
+        --from-literal=RPCPASS="$${RPCPASS}"
+        --dry-run=client -o yaml | kubectl apply -f -
+
+      - kubectl apply -k ./apps/btc/overlays/latest/
+      - kubectl rollout status -n btc deployment/btc-latest --timeout=90s
+      - kubectl get deployment btc-latest -n btc -o jsonpath='{.spec.template.spec.containers[*].image}'
+
+labels:
+  platform: linux/amd64
