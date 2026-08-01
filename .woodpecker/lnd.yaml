@@ -1,0 +1,67 @@
+when:
+  - path:
+      include:
+        - '.woodpecker/lnd.yaml'
+        - 'apps/lnd/**'
+
+clone:
+  - name: git
+    image: woodpeckerci/plugin-git
+    volumes:
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+
+steps:
+  - name: lint
+    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    environment:
+      KUBECONFIG_DATA:
+        from_secret: lnd-deployer
+      BITCOIND_RPCPASS:
+        from_secret: lnd_bitcoind_rpcpass
+      WALLET_PASSWORD:
+        from_secret: lnd_wallet_password
+    commands:
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
+      - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
+      - export KUBECONFIG=~/.kubeconfig
+
+      - >-
+        kubectl create secret generic lnd-secrets
+        --namespace=lnd
+        --from-literal=BITCOIND_RPCPASS="$${BITCOIND_RPCPASS}"
+        --from-literal=WALLET_PASSWORD="$${WALLET_PASSWORD}"
+        --dry-run=client -o yaml | kubectl apply --dry-run=client -f -
+
+      - kubectl apply -k ./apps/lnd/ --dry-run=client
+      - kubectl apply -k ./apps/lnd/ --dry-run=server
+
+  - name: deploy
+    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    environment:
+      KUBECONFIG_DATA:
+        from_secret: lnd-deployer
+      BITCOIND_RPCPASS:
+        from_secret: lnd_bitcoind_rpcpass
+      WALLET_PASSWORD:
+        from_secret: lnd_wallet_password
+    when:
+      - event: push
+        branch: main
+    commands:
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
+      - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
+      - export KUBECONFIG=~/.kubeconfig
+
+      - >-
+        kubectl create secret generic lnd-secrets
+        --namespace=lnd
+        --from-literal=BITCOIND_RPCPASS="$${BITCOIND_RPCPASS}"
+        --from-literal=WALLET_PASSWORD="$${WALLET_PASSWORD}"
+        --dry-run=client -o yaml | kubectl apply -f -
+
+      - kubectl apply -k ./apps/lnd/
+      - kubectl rollout status -n lnd deployment/lnd --timeout=90s
+      - kubectl get deployment lnd -n lnd -o jsonpath='{.spec.template.spec.containers[*].image}'
+
+labels:
+  platform: linux/amd64
