@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ServiceAccount
+
+metadata:
+  name: lnd-deployer
+  namespace: lnd
+
+---
+
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: lnd-deployer-token
+  namespace: lnd
+  annotations:
+    kubernetes.io/service-account.name: lnd-deployer
+
+type: kubernetes.io/service-account-token
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+
+metadata:
+  name: lnd-deployer-binding
+  namespace: lnd
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+
+subjects:
+- kind: ServiceAccount
+  name: lnd-deployer
+  namespace: lnd
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+
+metadata:
+  name: lnd-deployer-traefik
+  namespace: lnd
+
+rules:
+- apiGroups:
+  - traefik.io
+  resources:
+  - '*'
+  verbs:
+  - '*'
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+
+metadata:
+  name: lnd-deployer-traefik-binding
+  namespace: lnd
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: lnd-deployer-traefik
+
+subjects:
+- kind: ServiceAccount
+  name: lnd-deployer
+  namespace: lnd
