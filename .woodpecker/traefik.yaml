@@ -1,0 +1,45 @@
+when:
+  - path:
+      include:
+        - '.woodpecker/traefik.yaml'
+        - 'infra/traefik/**'
+
+clone:
+  - name: git
+    image: woodpeckerci/plugin-git
+    volumes:
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+
+steps:
+  - name: lint
+    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    environment:
+      KUBECONFIG_DATA:
+        from_secret: infra-deployer
+    commands:
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
+      - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
+      - export KUBECONFIG=~/.kubeconfig
+
+      - kustomize build ./infra/traefik/ --enable-helm | kubectl apply --dry-run=client -f -
+      - kustomize build ./infra/traefik/ --enable-helm | kubectl apply --dry-run=server -f -
+
+  - name: deploy
+    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    environment:
+      KUBECONFIG_DATA:
+        from_secret: infra-deployer
+    when:
+      - event: push
+        branch: main
+    commands:
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
+      - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
+      - export KUBECONFIG=~/.kubeconfig
+
+      - kustomize build ./infra/traefik/ --enable-helm | kubectl apply -f -
+      - kubectl rollout status -n kube-system deployment/traefik --timeout=90s
+      - kubectl get deployment traefik -n kube-system -o jsonpath='{.spec.template.spec.containers[*].image}'
+
+labels:
+  platform: linux/amd64
