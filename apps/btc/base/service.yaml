@@ -32,6 +32,7 @@ metadata:
 
 spec:
   type: LoadBalancer
+  externalTrafficPolicy: Local
   ports:
   - name: btc-rpc
     port: 18332
