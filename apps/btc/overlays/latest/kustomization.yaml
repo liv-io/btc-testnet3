@@ -8,5 +8,5 @@ resources:
   - ../../base
 
 images:
-  - name: registry.liv.io/liv/bitcoin-core
+  - name: code.liv.io/liv/bitcoin-core
     newTag: 31.1-1

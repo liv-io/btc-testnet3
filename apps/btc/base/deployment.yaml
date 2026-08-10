@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: bitcoin-core
-        image: registry.liv.io/liv/bitcoin-core
+        image: code.liv.io/liv/bitcoin-core
         workingDir: /
         ports:
         - name: btc-network
@@ -89,7 +89,7 @@ spec:
         - name: btc-db
           mountPath: /var/local/bitcoin-core/db
       imagePullSecrets:
-      - name: registry.liv.io
+      - name: code.liv.io
       volumes:
       - name: btc-db
         persistentVolumeClaim:

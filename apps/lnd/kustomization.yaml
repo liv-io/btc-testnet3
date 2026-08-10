@@ -11,5 +11,5 @@ resources:
   - servers-transport.yaml
 
 images:
-  - name: registry.liv.io/liv/lnd
+  - name: code.liv.io/liv/lnd
     newTag: 0.21.1-beta-1

@@ -13,7 +13,7 @@ clone:
 
 steps:
   - name: lint
-    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    image: code.liv.io/liv/k8s-ops:1.36.2-1
     environment:
       KUBECONFIG_DATA:
         from_secret: btc-deployer
@@ -34,7 +34,7 @@ steps:
       - kubectl apply -k ./apps/btc/overlays/latest/ --dry-run=server
 
   - name: deploy
-    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    image: code.liv.io/liv/k8s-ops:1.36.2-1
     environment:
       KUBECONFIG_DATA:
         from_secret: btc-deployer

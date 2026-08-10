@@ -12,7 +12,7 @@ clone:
 
 steps:
   - name: lint
-    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    image: code.liv.io/liv/k8s-ops:1.36.2-1
     environment:
       KUBECONFIG_DATA:
         from_secret: infra-deployer
@@ -25,7 +25,7 @@ steps:
       - kustomize build ./infra/traefik/ --enable-helm | kubectl apply --dry-run=server -f -
 
   - name: deploy
-    image: registry.liv.io/liv/k8s-ops:1.36.2-1
+    image: code.liv.io/liv/k8s-ops:1.36.2-1
     environment:
       KUBECONFIG_DATA:
         from_secret: infra-deployer

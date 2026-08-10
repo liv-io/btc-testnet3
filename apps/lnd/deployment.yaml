@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: lnd
-        image: registry.liv.io/liv/lnd
+        image: code.liv.io/liv/lnd
         workingDir: /
         ports:
         - name: lnd-network
@@ -76,7 +76,7 @@ spec:
         - name: lnd-data
           mountPath: /var/local/lnd/data
       imagePullSecrets:
-      - name: registry.liv.io
+      - name: code.liv.io
       volumes:
       - name: lnd-data
         persistentVolumeClaim:
