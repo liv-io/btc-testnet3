@@ -12,4 +12,4 @@ resources:
 
 images:
   - name: code.liv.io/liv/lnd
-    newTag: 0.21.1-beta-1
+    newTag: 0.21.2-beta-1
