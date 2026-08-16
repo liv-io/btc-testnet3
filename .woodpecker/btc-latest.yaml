@@ -9,7 +9,9 @@ clone:
   - name: git
     image: woodpeckerci/plugin-git
     volumes:
-      - /etc/ssl/certs:/etc/ssl/certs:ro
+      - custom-ca-certs:/etc/ssl/certs/custom:ro
+    settings:
+      custom_ssl_path: /etc/ssl/certs/custom/ca1.liv.io.crt
 
 steps:
   - name: lint
