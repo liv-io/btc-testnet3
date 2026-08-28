@@ -9,15 +9,15 @@ spec:
   ports:
   - name: network
     port: 18333
-    targetPort: network
+    targetPort: 18333
     protocol: TCP
   - name: zmqphblock
     port: 5555
-    targetPort: zmqphblock
+    targetPort: 5555
     protocol: TCP
   - name: zmqphtx
     port: 5556
-    targetPort: zmqphtx
+    targetPort: 5556
     protocol: TCP
   selector:
     app: btc
@@ -36,15 +36,15 @@ spec:
   ports:
   - name: rpc
     port: 18332
-    targetPort: rpc
+    targetPort: 18332
     protocol: TCP
   - name: zmqprblock
     port: 5557
-    targetPort: zmqprblock
+    targetPort: 5557
     protocol: TCP
   - name: zmqprtx
     port: 5558
-    targetPort: zmqprtx
+    targetPort: 5558
     protocol: TCP
   selector:
     app: btc
