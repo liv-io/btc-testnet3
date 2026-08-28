@@ -19,12 +19,13 @@ spec:
       containers:
       - name: lnd
         image: code.liv.io/liv/lnd
+        imagePullPolicy: IfNotPresent
         workingDir: /
         ports:
-        - name: lnd-network
+        - name: network
           containerPort: 9735
           protocol: TCP
-        - name: lnd-rest
+        - name: rest
           containerPort: 8080
           protocol: TCP
         env:
@@ -33,7 +34,7 @@ spec:
         - name: ALIAS
           value: "liv.io"
         - name: BITCOIND_RPCHOST
-          value: "btc-external-latest.btc.svc.cluster.local:18332"
+          value: "ext-latest.btc:18332"
         - name: BITCOIND_RPCPASS
           valueFrom:
             secretKeyRef:
@@ -42,9 +43,9 @@ spec:
         - name: BITCOIND_RPCUSER
           value: "satoshi"
         - name: BITCOIND_ZMQPUBRAWBLOCK
-          value: "tcp://btc-external-latest.btc.svc.cluster.local:5557"
+          value: "tcp://ext-latest.btc:5557"
         - name: BITCOIND_ZMQPUBRAWTX
-          value: "tcp://btc-external-latest.btc.svc.cluster.local:5558"
+          value: "tcp://ext-latest.btc:5558"
         - name: COLOR
           value: "#00cdfa"
         - name: EXTERNALIP
@@ -62,22 +63,18 @@ spec:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
-            - CAP_MKNOD
-            - CAP_NET_RAW
-            - CAP_AUDIT_WRITE
+            - ALL
           privileged: false
           readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsGroup: 10000
           runAsUser: 10000
-          seLinuxOptions:
-            type: spc_t
         volumeMounts:
-        - name: lnd-data
+        - name: data
           mountPath: /var/local/lnd/data
       imagePullSecrets:
       - name: code.liv.io
       volumes:
-      - name: lnd-data
+      - name: data
         persistentVolumeClaim:
-          claimName: lnd-pvc
+          claimName: data
