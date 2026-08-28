@@ -19,24 +19,25 @@ spec:
       containers:
       - name: bitcoin-core
         image: code.liv.io/liv/bitcoin-core
+        imagePullPolicy: IfNotPresent
         workingDir: /
         ports:
-        - name: btc-network
+        - name: network
           containerPort: 18333
           protocol: TCP
-        - name: btc-rpc
+        - name: rpc
           containerPort: 18332
           protocol: TCP
-        - name: btc-zmqphblock
+        - name: zmqphblock
           containerPort: 5555
           protocol: TCP
-        - name: btc-zmqphtx
+        - name: zmqphtx
           containerPort: 5556
           protocol: TCP
-        - name: btc-zmqprblock
+        - name: zmqprblock
           containerPort: 5557
           protocol: TCP
-        - name: btc-zmqprtx
+        - name: zmqprtx
           containerPort: 5558
           protocol: TCP
         env:
@@ -75,22 +76,18 @@ spec:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
-            - CAP_MKNOD
-            - CAP_NET_RAW
-            - CAP_AUDIT_WRITE
+            - ALL
           privileged: false
           readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsGroup: 10000
           runAsUser: 10000
-          seLinuxOptions:
-            type: spc_t
         volumeMounts:
-        - name: btc-db
+        - name: db
           mountPath: /var/local/bitcoin-core/db
       imagePullSecrets:
       - name: code.liv.io
       volumes:
-      - name: btc-db
+      - name: db
         persistentVolumeClaim:
-          claimName: btc-pvc
+          claimName: db

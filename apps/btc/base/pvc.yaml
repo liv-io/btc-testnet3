@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 
 metadata:
-  name: btc-pvc
+  name: db
 
 spec:
   accessModes:
