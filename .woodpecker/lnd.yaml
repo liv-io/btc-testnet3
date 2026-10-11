@@ -14,7 +14,7 @@ clone:
 
 steps:
   - name: lint
-    image: code.liv.io/liv/k8s-ops:1.36.2-2
+    image: code.liv.io/liv/k8s-ops:1.37.1-1
     environment:
       KUBECONFIG_DATA:
         from_secret: lnd-deployer
@@ -47,7 +47,7 @@ steps:
       - kubectl apply -k ./apps/lnd/ --dry-run=server
 
   - name: deploy
-    image: code.liv.io/liv/k8s-ops:1.36.2-2
+    image: code.liv.io/liv/k8s-ops:1.37.1-1
     environment:
       KUBECONFIG_DATA:
         from_secret: lnd-deployer
