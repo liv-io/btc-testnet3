@@ -40,8 +40,8 @@ steps:
         --from-literal=RPCPASS="$${RPCPASS}"
         --dry-run=client -o yaml | kubectl apply --dry-run=client -f -
 
-      - kubectl apply -k ./apps/bitcoin-core/overlays/latest/ --dry-run=client
-      - kubectl apply -k ./apps/bitcoin-core/overlays/latest/ --dry-run=server
+      - kubectl apply -k ./apps/bitcoin-core/ --dry-run=client
+      - kubectl apply -k ./apps/bitcoin-core/ --dry-run=server
 
   - name: deploy
     image: code.liv.io/liv/k8s-ops:1.37.1-1
@@ -73,7 +73,7 @@ steps:
         --from-literal=RPCPASS="$${RPCPASS}"
         --dry-run=client -o yaml | kubectl apply -f -
 
-      - kubectl apply -k ./apps/bitcoin-core/overlays/latest/
+      - kubectl apply -k ./apps/bitcoin-core/
       - kubectl rollout status -n bitcoin-core deployment/bitcoin-core-latest --timeout=90s
       - kubectl get deployment bitcoin-core-latest -n bitcoin-core -o jsonpath='{.spec.template.spec.containers[*].image}'
 
