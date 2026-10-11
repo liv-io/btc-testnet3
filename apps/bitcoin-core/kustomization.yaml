@@ -1,0 +1,100 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - git@code.liv.io:liv/oci-manifests.git//bitcoin-core?ref=main
+
+namespace: bitcoin-core
+nameSuffix: -latest
+
+images:
+  - name: bitcoin-core
+    newName: code.liv.io/liv/bitcoin-core
+    newTag: 31.1-1
+
+patches:
+  - patch: |-
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: db
+        spec:
+          resources:
+            requests:
+              storage: 500Gi
+
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: bitcoin-core
+      spec:
+        template:
+          spec:
+            imagePullSecrets:
+              - name: code.liv.io
+            containers:
+              - name: bitcoin-core
+                ports:
+                  - $patch: replace
+                  - name: network
+                    containerPort: 18333
+                  - name: rpc
+                    containerPort: 18332
+                  - name: zmqphblock
+                    containerPort: 5555
+                  - name: zmqphtx
+                    containerPort: 5556
+                  - name: zmqprblock
+                    containerPort: 5557
+                  - name: zmqprtx
+                    containerPort: 5558
+                env:
+                  - name: CHAIN
+                    value: "testnet3"
+                  - name: PORT
+                    value: "18333"
+                  - name: RPCPORT
+                    value: "18332"
+
+  - patch: |-
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: int
+      spec:
+        ports:
+          - $patch: replace
+          - name: network
+            port: 18333
+            targetPort: 18333
+            protocol: TCP
+          - name: zmqphblock
+            port: 5555
+            targetPort: 5555
+            protocol: TCP
+          - name: zmqphtx
+            port: 5556
+            targetPort: 5556
+            protocol: TCP
+
+  - patch: |-
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: ext
+      spec:
+        ports:
+          - $patch: replace
+          - name: rpc
+            port: 18332
+            targetPort: 18332
+            protocol: TCP
+          - name: zmqprblock
+            port: 5557
+            targetPort: 5557
+            protocol: TCP
+          - name: zmqprtx
+            port: 5558
+            targetPort: 5558
+            protocol: TCP
