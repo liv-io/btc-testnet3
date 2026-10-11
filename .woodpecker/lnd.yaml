@@ -22,7 +22,16 @@ steps:
         from_secret: lnd_bitcoind_rpcpass
       WALLET_PASSWORD:
         from_secret: lnd_wallet_password
+      SSH_KEY:
+        from_secret: code_container_ssh
     commands:
+      - /cmd.sh
+
+      - install --directory --owner=k8s --group=k8s --mode=0700 ~/.ssh
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.ssh/id_ed25519
+      - echo "$${SSH_KEY}" > ~/.ssh/id_ed25519
+      - export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new"
+
       - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
       - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
       - export KUBECONFIG=~/.kubeconfig
@@ -46,10 +55,19 @@ steps:
         from_secret: lnd_bitcoind_rpcpass
       WALLET_PASSWORD:
         from_secret: lnd_wallet_password
+      SSH_KEY:
+        from_secret: code_container_ssh
     when:
       - event: push
         branch: main
     commands:
+      - /cmd.sh
+
+      - install --directory --owner=k8s --group=k8s --mode=0700 ~/.ssh
+      - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.ssh/id_ed25519
+      - echo "$${SSH_KEY}" > ~/.ssh/id_ed25519
+      - export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new"
+
       - install --owner=k8s --group=k8s --mode=0600 /dev/null ~/.kubeconfig
       - echo "$${KUBECONFIG_DATA}" > ~/.kubeconfig
       - export KUBECONFIG=~/.kubeconfig
