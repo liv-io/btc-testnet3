@@ -21,7 +21,7 @@ steps:
       RPCPASS:
         from_secret: bitcoin-core_rpcpass
       SSH_KEY:
-        from_secret: code_ssh_container
+        from_secret: code_container_ssh
     commands:
       - /cmd.sh
 
@@ -51,7 +51,7 @@ steps:
       RPCPASS:
         from_secret: bitcoin-core_rpcpass
       SSH_KEY:
-        from_secret: code_ssh_container
+        from_secret: code_container_ssh
     when:
       - event: push
         branch: main
