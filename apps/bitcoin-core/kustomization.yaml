@@ -10,7 +10,7 @@ nameSuffix: -latest
 images:
   - name: bitcoin-core
     newName: code.liv.io/liv/bitcoin-core
-    newTag: 31.1-1
+    newTag: 32.1-1
 
 patches:
   - patch: |-
