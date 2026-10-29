@@ -7,7 +7,7 @@ resources:
 images:
   - name: lnd
     newName: code.liv.io/liv/lnd
-    newTag: 0.21.4-beta-1
+    newTag: 0.21.5-beta-1
 
 patches:
   - patch: |-
