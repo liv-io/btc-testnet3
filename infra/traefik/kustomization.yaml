@@ -13,7 +13,7 @@ configMapGenerator:
 helmCharts:
   - name: traefik
     repo: https://traefik.github.io/charts
-    version: 42.4.1
+    version: 43.0.0
     releaseName: traefik
     namespace: kube-system
     valuesInline:
